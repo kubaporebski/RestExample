@@ -12,14 +12,30 @@ namespace RestExample
     public class BDL
     {
         [SqlFunction]
-        public static SqlString GetTopSubjects(string apiKey)
+        public static SqlString FetchTopSubjects(string apiKey)
         {
-            string url = "https://bdl.stat.gov.pl/api/v1/subjects?format=json";
+            string url = "https://bdl.stat.gov.pl/api/v1/subjects?format=json&page-size=100";
 
             using (var client = new WebClient())
             {
                 client.Headers["X-ClientId"] = apiKey;
-                return new SqlString(client.DownloadString(url));
+
+                var utf8string = Encoding.UTF8.GetString(client.DownloadData(url));
+                return new SqlString(utf8string);
+            }
+        }
+
+        [SqlFunction]
+        public static SqlString FetchMeasureUnits(string apiKey)
+        {
+            string url = "https://bdl.stat.gov.pl/api/v1/measures?format=json&page-size=100";
+
+            using (var client = new WebClient())
+            {
+                client.Headers["X-ClientId"] = apiKey;
+
+                var utf8string = Encoding.UTF8.GetString(client.DownloadData(url));
+                return new SqlString(utf8string);
             }
         }
     }
